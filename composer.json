@@ -1,0 +1,27 @@
+{
+    "name": "fforattini/ormaster",
+    "description": "Test",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Filipe Forattini",
+            "email": "filipeforattini1@gmail.com"
+        }
+    ],
+    "require": {
+        "lichtner/fluentpdo": "dev-master",
+        "icanboogie/inflector": "^1.4",
+        "doctrine/dbal": "^2.5",
+        "ramsey/uuid": "^3.5"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "*",
+        "fzaninotto/faker": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "SimpleORM\\": "src"
+        }
+    }
+}
