@@ -17,8 +17,8 @@ composer require "fforattini/simpleorm"
 ```
 
 Read the unit tests files for faster understanding of the package:
-+ [Entity Tests](tests/EntityTests.php)
-+ [Repository Tests](tests/RepositoryTests.php)
++ [Entity](tests/EntityTests.php)
++ [Repository](tests/RepositoryTests.php)
 
 ## How to use
 
