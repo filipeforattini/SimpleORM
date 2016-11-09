@@ -1,6 +1,6 @@
 {
-    "name": "fforattini/ormaster",
-    "description": "Test",
+    "name": "fforattini/simplesorm",
+    "description": "SimpleORM",
     "type": "library",
     "license": "MIT",
     "authors": [
