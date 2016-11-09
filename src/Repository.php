@@ -14,17 +14,31 @@ class Repository extends SplDoublyLinkedList
 
     public function __construct($entity, Connection $connection)
     {
+        $entity::setupColumns($connection);
+
         $this->connection = $connection;
         $this->entity = $entity;
         $this->table = $entity::getTableName();
         $this->pk = $entity::getPk();
+        $this->columns = $entity::getColumns();
+    }
+
+    public function columnsToSql()
+    {
+        return "(`".implode("`,`", $this->columns)."`) ";
     }
 
     public function all()
     {
-        $this->exchangeArray(
-            $this->connection->fetchAll("SELECT * FROM {$this->table}")
-        );
+        $list = $this->connection->fetchAll("SELECT * FROM {$this->table}");
+
+        $entityClass = $this->entity;
+
+        foreach ($list as $item) {
+            $this->push(new $entityClass($item));
+        }
+
+        return $this;
     }
 
     public function insert(Entity $entity)
@@ -56,10 +70,9 @@ class Repository extends SplDoublyLinkedList
         }
     }
 
-    public function saveAll()
+    public function saveAll($oneByOne = false)
     {
-        $inserts = [];
-        $updates = [];
+        list($inserts, $updates) = array([], []);
 
         foreach($this as $entity) {
             if($entity->isNew()) {
@@ -70,8 +83,7 @@ class Repository extends SplDoublyLinkedList
             }
         }
 
-        $sql_inserts = "
-            INSERT INTO {$this->table}
+        $sql_inserts = "INSERT INTO {$this->table} {$this->columnsToSql()}
             VALUES ".implode(', ', $inserts).";";
 
         $this->connection->exec($sql_inserts);

@@ -2,8 +2,10 @@
 namespace SimpleORM;
 
 use ArrayObject;
+use Faker\Factory;
+use Faker\Generator;
 use ICanBoogie\Inflector;
-use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Table;
 
 /**
@@ -20,7 +22,7 @@ abstract class Entity extends ArrayObject
      *
      * @var string
      */
-    public static $table = null;
+    protected static $_table = null;
 
     /**
      * Primary key
@@ -28,6 +30,13 @@ abstract class Entity extends ArrayObject
      * @var array
      */
     protected static $_pk = ['id'];
+
+    /**
+     * Columns
+     *
+     * @var array
+     */
+    protected static $_columns = [];
 
     /**
      * Saves if the object was created without co-relation from the
@@ -47,20 +56,16 @@ abstract class Entity extends ArrayObject
 
     /**
      * Entity constructor.
+     *
      * @param array $attributes
      */
     public function __construct($attributes = [])
     {
         if(is_null(static::getTableName())) {
-            static::$table = static::inferTable();
+            static::$_table = static::inferTable();
         }
 
         parent::__construct($attributes, ArrayObject::ARRAY_AS_PROPS);
-    }
-
-    public static function newTable()
-    {
-        return new Table(static::getTableName());
     }
 
     /**
@@ -68,9 +73,58 @@ abstract class Entity extends ArrayObject
      * @param Schema|null $schema
      * @return Table
      */
-    public static function createTable()
+    public static function createTable(callable $callable = null)
+    {
+        $table = new Table(static::getTableName());
+
+        if(is_null($callable)) {
+            return static::defineTable($table);
+        }
+
+        return call_user_func_array($callable, [$table]);
+    }
+
+    /**
+     * @param Table $table
+     * @return Table
+     */
+    public static function defineTable(Table $table)
     {
         return $table;
+    }
+
+    /**
+     * @param callable|null $callable
+     * @return static
+     */
+    public static function factory(callable $callable = null)
+    {
+        if(is_null($callable)) {
+            return new static(static::defineFactory(Factory::create()));
+        }
+
+        return new static(call_user_func_array($callable, [Factory::create()]));
+    }
+
+    /**
+     * @param Generator $faker
+     * @return array
+     */
+    public static function defineFactory(Generator $faker)
+    {
+        return [];
+    }
+
+    /**
+     * Infers the table name for the entity object.
+     *
+     * @return string
+     */
+    public static function inferTable()
+    {
+        $class = explode('\\', get_called_class());
+
+        return Inflector::get('en')->pluralize(mb_strtolower(end($class)));
     }
 
     /**
@@ -79,11 +133,45 @@ abstract class Entity extends ArrayObject
      */
     public static function getTableName()
     {
-        if(is_null(static::$table)) {
-            static::$table = static::inferTable();
+        if(is_null(static::$_table)) {
+            static::$_table = static::inferTable();
         }
 
-        return (string) static::$table;
+        return (string) static::$_table;
+    }
+
+    /**
+     * @param Connection $connection
+     */
+    public static function setupColumns(Connection $connection)
+    {
+        static::$_columns = [];
+
+        $columns = $connection
+            ->getSchemaManager()
+            ->listTableColumns(static::getTableName());
+
+        foreach($columns as $index => $column) {
+            static::$_columns[] = $index;
+        }
+    }
+
+    /**
+     * Returns an array of columns.
+     *
+     * @return array
+     */
+    public static function getColumns()
+    {
+        return static::$_columns;
+    }
+
+    /**
+     * @return string
+     */
+    public static function columnsToSql()
+    {
+        return "(`".implode("`,`", static::getColumns())."`)";
     }
 
     /**
@@ -94,6 +182,16 @@ abstract class Entity extends ArrayObject
     public static function getPk()
     {
         return static::$_pk;
+    }
+
+    /**
+     * Set array of primary keys.
+     *
+     * @param array $pk
+     */
+    public static function setPk($pk)
+    {
+        static::$_pk = $pk;
     }
 
     /**
@@ -111,22 +209,9 @@ abstract class Entity extends ArrayObject
      *
      * @return bool
      */
-    public function isChanged()
+    public function hasChanged()
     {
         return $this->_changed;
-    }
-
-    /**
-     * Infers the table name for the entity object.
-     *
-     * @return string
-     */
-    public static function inferTable()
-    {
-        $class = explode('\\', get_called_class());
-
-        return Inflector::get('en')
-            ->pluralize(mb_strtolower(end($class)));
     }
 
     /**
@@ -135,6 +220,6 @@ abstract class Entity extends ArrayObject
      */
     public function toSql()
     {
-        return "(`".implode("`,`", $this->getArrayCopy())."`)";
+        return "('".implode("','", $this->getArrayCopy())."')";
     }
 }

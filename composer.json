@@ -10,7 +10,6 @@
         }
     ],
     "require": {
-        "lichtner/fluentpdo": "dev-master",
         "icanboogie/inflector": "^1.4",
         "doctrine/dbal": "^2.5",
         "ramsey/uuid": "^3.5"

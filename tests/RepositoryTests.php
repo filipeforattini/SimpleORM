@@ -70,6 +70,22 @@ class RepositoryTests extends PHPUnit_Framework_TestCase
     public function can_insert()
     {
         $faker = Faker\Factory::create();
+        $repository = new Repository(Book::class, $this->connection);
+
+        $repository->save(new Book([
+            'id' => Ramsey\Uuid\Uuid::uuid4(),
+            'name' => $faker->sentence(5, true),
+        ]));
+
+        static::assertEquals($repository->all()->count(), 1);
+    }
+
+    /**
+     * @test
+     */
+    public function can_insert_a_list()
+    {
+        $faker = Faker\Factory::create();
 
         $repository = new Repository(Book::class, $this->connection);
 

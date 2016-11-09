@@ -11,10 +11,11 @@
          syntaxCheck="false">
     <php>
         <env name="sqlite_database" value="database.sqlite"/>
-        <env name="table_lines" value="100"/>
+        <env name="table_lines" value="10"/>
     </php>
     <testsuites>
         <testsuite>
+            <file>tests/EntityTests.php</file>
             <file>tests/RepositoryTests.php</file>
         </testsuite>
     </testsuites>
