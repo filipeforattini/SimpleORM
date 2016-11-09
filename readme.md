@@ -125,7 +125,7 @@ $books = new Repository(Book::class, $connection);
 
 #### Retriving information
 
-To populate your `Repository` get all elements.
+To populate your `Repository` with all of your elements.
 
 ```php
 $books->all();
