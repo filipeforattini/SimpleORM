@@ -1,5 +1,6 @@
 <?php
 
+use Doctrine\DBAL\DriverManager;
 use Ramsey\Uuid\Uuid;
 use SimpleORM\Entity;
 
@@ -7,6 +8,16 @@ require_once('assets/Book.php');
 
 class EntityTests extends PHPUnit_Framework_TestCase
 {
+    public static function setUpBeforeClass()
+    {
+        $schema = DriverManager::getConnection([
+            'driver'    => 'pdo_sqlite',
+            'path'      => __DIR__.'/assets/'.getenv('sqlite_database'),
+        ])->getSchemaManager();
+
+        $schema->dropTable(Book::getTableName());
+    }
+
     /**
      * @test
      */
@@ -42,5 +53,20 @@ class EntityTests extends PHPUnit_Framework_TestCase
     public function created_entity_is_new()
     {
         static::assertTrue((new Book)->isNew());
+    }
+
+    /**
+     * @test
+     */
+    public function create_table()
+    {
+        $schema = DriverManager::getConnection([
+            'driver'    => 'pdo_sqlite',
+            'path'      => __DIR__.'/assets/'.getenv('sqlite_database'),
+        ])->getSchemaManager();
+
+        $schema->createTable(Book::getTable());
+
+        static::assertTrue($schema->tablesExist(Book::getTableName()));
     }
 }

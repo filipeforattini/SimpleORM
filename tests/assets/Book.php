@@ -9,6 +9,7 @@ use Doctrine\DBAL\Schema\Table;
 class Book extends Entity
 {
     /**
+     * @param Table $table
      * @return Table
      */
     public static function defineTable(Table $table)
@@ -20,7 +21,6 @@ class Book extends Entity
         $table->addColumn('name', 'string');
         $table->addUniqueIndex(["id"]);
         $table->setPrimaryKey(['id']);
-
         return $table;
     }
 
@@ -28,7 +28,7 @@ class Book extends Entity
      * @param Generator $faker
      * @return array
      */
-    public static function defineMock(Generator $faker)
+    public static function defineFactory(Generator $faker)
     {
         return [
             'id' => Uuid::uuid4(),

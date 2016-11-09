@@ -45,7 +45,7 @@ class RepositoryTests extends PHPUnit_Framework_TestCase
     {
         $schema_manager = $this->connection->getSchemaManager();
 
-        $schema_manager->createTable(Book::createTable());
+        $schema_manager->createTable(Book::getTable());
 
         static::assertTrue(
             $schema_manager->tablesExist(

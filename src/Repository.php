@@ -6,12 +6,37 @@ use Doctrine\DBAL\Connection;
 
 class Repository extends SplDoublyLinkedList
 {
+    /**
+     * @var string
+     */
     protected $entity;
+
+    /**
+     * @var string
+     */
     protected $table;
+
+    /**
+     * @var array
+     */
     protected $columns;
+
+    /**
+     * @var Connection
+     */
     protected $connection;
+
+    /**
+     * @var array
+     */
     protected $pk;
 
+    /**
+     * Repository constructor.
+     *
+     * @param $entity
+     * @param Connection $connection
+     */
     public function __construct($entity, Connection $connection)
     {
         $entity::setupColumns($connection);
@@ -23,11 +48,17 @@ class Repository extends SplDoublyLinkedList
         $this->columns = $entity::getColumns();
     }
 
+    /**
+     * @return string
+     */
     public function columnsToSql()
     {
         return "(`".implode("`,`", $this->columns)."`) ";
     }
 
+    /**
+     * @return Repository
+     */
     public function all()
     {
         $list = $this->connection->fetchAll("SELECT * FROM {$this->table}");
@@ -41,6 +72,10 @@ class Repository extends SplDoublyLinkedList
         return $this;
     }
 
+    /**
+     * @param Entity $entity
+     * @return Repository
+     */
     public function insert(Entity $entity)
     {
         $this->connection->insert(
@@ -51,7 +86,11 @@ class Repository extends SplDoublyLinkedList
         return $this;
     }
 
-    public function update($attributes)
+    /**
+     * @param array $attributes
+     * @return Repository
+     */
+    public function update($attributes = [])
     {
         $this->connection->update(
             $this->table,
@@ -62,14 +101,23 @@ class Repository extends SplDoublyLinkedList
         return $this;
     }
 
-
+    /**
+     * @param Entity $entity
+     * @return Repository
+     */
     public function save(Entity $entity)
     {
         if($entity->isNew()) {
             $this->insert($entity);
         }
+
+        return $this;
     }
 
+    /**
+     * @param bool $oneByOne
+     * @return Repository
+     */
     public function saveAll($oneByOne = false)
     {
         list($inserts, $updates) = array([], []);
@@ -87,5 +135,7 @@ class Repository extends SplDoublyLinkedList
             VALUES ".implode(', ', $inserts).";";
 
         $this->connection->exec($sql_inserts);
+
+        return $this;
     }
 }

@@ -73,7 +73,7 @@ abstract class Entity extends ArrayObject
      * @param Schema|null $schema
      * @return Table
      */
-    public static function createTable(callable $callable = null)
+    public static function getTable(callable $callable = null)
     {
         $table = new Table(static::getTableName());
 
