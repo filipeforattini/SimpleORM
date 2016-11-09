@@ -2,7 +2,9 @@
 
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
 
-SimpleORM is an intuitive package to work with `Entity` and `Repository` abstractions. Developed over `Doctrine\DBAL` package to ensure quality and versality of development.
+SimpleORM is an intuitive package to work with `Entity` and `Repository` abstractions.
+
+This package was developed using [`Doctrine\DBAL`](docs.doctrine-project.org/projects/doctrine-dbal/en/latest/) package to ensure quality and versatility of development.
 
 ## Get started
 
