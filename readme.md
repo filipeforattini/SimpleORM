@@ -120,13 +120,17 @@ DriverManager::getConnection([
     'path' => 'database.sqlite',
 ]);
 
-$repository = new Repository(Book::class, $connection);
+$books = new Repository(Book::class, $connection);
 ```
 
 #### Retriving information
 
+To populate your `Repository` get all elements.
+
 ```php
-foreach($repository->all() as $book) {
+$books->all();
+
+foreach($books as $book) {
     // do something here
 }
 ```
