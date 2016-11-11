@@ -155,7 +155,9 @@ $schema->createTable(Book::getTable());
 Or you can just pass a `callable` as parameter and you will receive an instance of the `Generator`:
 
 ```php
-$schema->createTable(Book::getTable(function($table){
+use SimpleORM\Entity;
+
+$schema->createTable(Entity::getTable(function($table){
     $table->addColumn('id', 'string', [
         'length' => 36,
         'unique' => true,
