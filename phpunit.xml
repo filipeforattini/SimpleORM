@@ -11,7 +11,7 @@
          syntaxCheck="false">
     <php>
         <env name="sqlite_database" value="database.sqlite"/>
-        <env name="table_lines" value="10"/>
+        <env name="table_lines" value="100"/>
     </php>
     <testsuites>
         <testsuite>
