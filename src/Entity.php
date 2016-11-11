@@ -62,7 +62,7 @@ abstract class Entity extends ArrayObject
     public function __construct($attributes = [])
     {
         if(is_null(static::getTableName())) {
-            static::$_table = static::inferTable();
+            static::$_table = static::inferTableName();
         }
 
         parent::__construct($attributes, ArrayObject::ARRAY_AS_PROPS);
@@ -82,15 +82,6 @@ abstract class Entity extends ArrayObject
         }
 
         return call_user_func_array($callable, [$table]);
-    }
-
-    /**
-     * @param Table $table
-     * @return Table
-     */
-    public static function defineTable(Table $table)
-    {
-        return $table;
     }
 
     /**
@@ -120,7 +111,7 @@ abstract class Entity extends ArrayObject
      *
      * @return string
      */
-    public static function inferTable()
+    public static function inferTableName()
     {
         $class = explode('\\', get_called_class());
 
@@ -134,7 +125,7 @@ abstract class Entity extends ArrayObject
     public static function getTableName()
     {
         if(is_null(static::$_table)) {
-            static::$_table = static::inferTable();
+            static::$_table = static::inferTableName();
         }
 
         return (string) static::$_table;

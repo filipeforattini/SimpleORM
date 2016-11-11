@@ -1,15 +1,17 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: ciber
- * Date: 11/11/2016
- * Time: 16:43
- */
-
 namespace SimpleORM;
 
+use Doctrine\DBAL\Schema\Table;
 
-class TableCreator
+/**
+ * Interface TableCreator
+ * @package SimpleORM
+ */
+Interface TableCreator
 {
-
+    /**
+     * @param Table $table
+     * @return Table
+     */
+    public static function defineTable(Table $table);
 }
