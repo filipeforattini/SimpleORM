@@ -4,9 +4,10 @@ require_once(__DIR__ . '/../../vendor/autoload.php');
 use Faker\Generator;
 use SimpleORM\Entity;
 use Ramsey\Uuid\Uuid;
+use SimpleORM\TableCreator;
 use Doctrine\DBAL\Schema\Table;
 
-class Book extends Entity
+class Book extends Entity implements TableCreator
 {
     /**
      * @param Table $table

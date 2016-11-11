@@ -8,14 +8,33 @@ require_once('assets/Book.php');
 
 class EntityTests extends PHPUnit_Framework_TestCase
 {
-    public static function setUpBeforeClass()
+    /**
+     * @var \Doctrine\DBAL\Driver\Connection
+     */
+    protected $connection;
+
+    /**
+     * @var \Doctrine\DBAL\Schema\AbstractSchemaManager
+     */
+    protected $schema;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setUp()
     {
-        $schema = DriverManager::getConnection([
+        $this->connection = DriverManager::getConnection([
             'driver'    => 'pdo_sqlite',
             'path'      => __DIR__.'/assets/'.getenv('sqlite_database'),
-        ])->getSchemaManager();
+        ]);
 
-        $schema->dropTable(Book::getTableName());
+        $this->schema = $this->connection->getSchemaManager();
+
+        $table = Book::getTableName();
+
+        if($this->schema->tablesExist($table)) {
+            $this->schema->dropTable($table);
+        }
     }
 
     /**
@@ -58,15 +77,29 @@ class EntityTests extends PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function create_table()
+    public function create_table_with_definition()
     {
-        $schema = DriverManager::getConnection([
-            'driver'    => 'pdo_sqlite',
-            'path'      => __DIR__.'/assets/'.getenv('sqlite_database'),
-        ])->getSchemaManager();
+        $this->schema->createTable(Book::getTable());
 
-        $schema->createTable(Book::getTable());
+        static::assertTrue($this->schema->tablesExist(Book::getTableName()));
+    }
 
-        static::assertTrue($schema->tablesExist(Book::getTableName()));
+    /**
+     * @test
+     */
+    public function create_table_with_callable()
+    {
+        $this->schema->createTable(Book::getTable(function($table){
+            $table->addColumn('id', 'string', [
+                'length' => 36,
+                'unique' => true,
+            ]);
+            $table->addColumn('name', 'string');
+            $table->addUniqueIndex(["id"]);
+            $table->setPrimaryKey(['id']);
+            return $table;
+        }));
+
+        static::assertTrue($this->schema->tablesExist(Book::getTableName()));
     }
 }
