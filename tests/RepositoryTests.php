@@ -98,4 +98,24 @@ class RepositoryTests extends PHPUnit_Framework_TestCase
 
         $repository->saveAll();
     }
+
+    /**
+     * @test
+     */
+    public function can_find_an_element()
+    {
+        $faker = Faker\Factory::create();
+        $id = Ramsey\Uuid\Uuid::uuid4();
+
+        $repository = new Repository(Book::class, $this->connection);
+
+        $repository->save(new Book([
+            'id' => $id,
+            'name' => $faker->sentence(5, true),
+        ]));
+
+        $book = $repository->find($id);
+
+        static::assertEquals($book->id, $id);
+    }
 }

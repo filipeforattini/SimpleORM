@@ -57,19 +57,57 @@ class Repository extends SplDoublyLinkedList
     }
 
     /**
+     * Creates an Entity.
+     *
+     * @param array $attributes
+     * @return Entity
+     */
+    public function createEntity($attributes = [])
+    {
+        $entityClass = $this->entity;
+
+        return new $entityClass($attributes);
+    }
+
+    /**
      * @return Repository
      */
     public function all()
     {
         $list = $this->connection->fetchAll("SELECT * FROM {$this->table}");
 
-        $entityClass = $this->entity;
-
         foreach ($list as $item) {
-            $this->push(new $entityClass($item));
+            $this->push($this->createEntity($item));
         }
 
         return $this;
+    }
+
+    /**
+     * Finds an Entity by given primary key.
+     *
+     * @param  array $pk
+     * @return Entity
+     */
+    public function find($pk)
+    {
+        if(! is_array($pk)) {
+            $pk = [$pk];
+        }
+
+        $query = [];
+        foreach($this->pk as $key) {
+            $query[] = "{$key} = ?";
+        }
+
+        $query = implode(" AND ", $query);
+
+        return $this->createEntity(
+            $this->connection->fetchAssoc(
+                "SELECT * FROM {$this->table} WHERE {$query};",
+                $pk
+            )
+        );
     }
 
     /**
